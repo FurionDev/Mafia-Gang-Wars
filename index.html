@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mafia Gang Wars</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap');
+
+:root {
+  --bg:       #0c0c0e;
+  --bg2:      #111116;
+  --bg3:      #18181f;
+  --panel:    #1c1c24;
+  --panel2:   #22222c;
+  --border:   #2a2a38;
+  --border2:  #353548;
+  --gold:     #d4a017;
+  --gold2:    #f0c040;
+  --gold3:    #7a5a08;
+  --red:      #c0392b;
+  --red2:     #e74c3c;
+  --red3:     #5a1010;
+  --green:    #27ae60;
+  --green2:   #2ecc71;
+  --blue:     #2471a3;
+  --blue2:    #3498db;
+  --text:     #d0d0e0;
+  --text2:    #888899;
+  --text3:    #555566;
+  --white:    #f0f0f8;
+  --ff:       'Oswald', sans-serif;
+  --fm:       'Rajdhani', sans-serif;
+  --fmono:    'Share Tech Mono', monospace;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--fm);
+  font-size:15px;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+/* ── SETUP SCREEN ── */
+#setup{
+  position:fixed;inset:0;z-index:999;
+  background:var(--bg);
+  display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1.2rem;
+  background-image:
+    radial-gradient(ellipse 70% 60% at 50% 20%,#1a1400 0%,transparent 70%),
+    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4a017' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+#setup .logo-icon{font-size:4rem;filter:drop-shadow(0 0 30px rgba(212,160,23,0.8));animation:glow-pulse 3s ease-in-out infinite}
+@keyframes glow-pulse{0%,100%{filter:drop-shadow(0 0 20px rgba(212,160,23,0.6))}50%{filter:drop-shadow(0 0 50px rgba(212,160,23,1))}}
+#setup h1{font-family:var(--ff);font-size:clamp(2rem,8vw,4rem);color:var(--gold);letter-spacing:0.08em;text-transform:uppercase;text-shadow:0 0 40px rgba(212,160,23,0.5)}
+#setup .setup-sub{font-family:var(--ff);font-size:0.75rem;letter-spacing:0.4em;color:var(--text2);text-transform:uppercase}
+#setup-form{display:flex;flex-direction:column;align-items:center;gap:0.8rem;width:100%;max-width:340px}
+#setup-form label{font-family:var(--ff);font-size:0.7rem;letter-spacing:0.2em;color:var(--text2);align-self:flex-start}
+#name-inp{
+  width:100%;background:var(--panel);border:1px solid var(--border2);border-radius:3px;
+  color:var(--white);font-family:var(--ff);font-size:1.1rem;letter-spacing:0.1em;
+  padding:0.75rem 1rem;outline:none;transition:border-color 0.2s,box-shadow 0.2s;
+}
+#name-inp:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,160,23,0.15)}
+#name-inp::placeholder{color:var(--text3)}
+.setup-btn{
+  width:100%;font-family:var(--ff);font-size:0.9rem;letter-spacing:0.2em;text-transform:uppercase;
+  background:linear-gradient(135deg,#7a5a08,#d4a017,#7a5a08);
+  color:#0c0800;font-weight:600;border:none;border-radius:3px;padding:0.85rem;
+  cursor:pointer;transition:box-shadow 0.2s,transform 0.15s;
+  box-shadow:0 4px 20px rgba(212,160,23,0.3);
+}
+.setup-btn:hover{box-shadow:0 6px 30px rgba(212,160,23,0.6);transform:translateY(-1px)}
+.setup-btn:active{transform:scale(0.98)}
+
+/* ── HEADER ── */
+#hdr{
+  background:var(--bg2);
+  border-bottom:2px solid var(--gold3);
+  padding:0.6rem 1rem;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:90;
+  box-shadow:0 2px 20px rgba(0,0,0,0.6);
+}
+#hdr .logo{font-family:var(--ff);font-size:1.3rem;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase;white-space:nowrap}
+#hdr .logo span{color:var(--red2)}
+#hdr-stats{display:flex;gap:1.2rem;align-items:center;flex-wrap:wrap}
+.hdr-stat{display:flex;flex-direction:column;align-items:center;min-width:56px}
+.hdr-stat .hs-label{font-size:0.55rem;letter-spacing:0.15em;color:var(--text2);text-transform:uppercase;font-family:var(--ff)}
+.hdr-stat .hs-val{font-family:var(--ff);font-size:0.95rem;font-weight:700;color:var(--gold2);line-height:1.1}
+.hdr-stat .hs-bar{width:56px;height:3px;background:var(--border);border-radius:2px;margin-top:2px;overflow:hidden}
+.hdr-stat .hs-bar-fill{height:100%;border-radius:2px;transition:width 0.5s ease}
+.eb-fill{background:linear-gradient(90deg,#d4a017,#f0c040)}
+.hb-fill{background:linear-gradient(90deg,#c0392b,#e74c3c)}
+.xb-fill{background:linear-gradient(90deg,#2471a3,#3498db)}
+
+/* ── TABS ── */
+#tab-bar{
+  background:var(--bg2);
+  border-bottom:1px solid var(--border);
+  display:flex;overflow-x:auto;padding:0 0.5rem;
+}
+#tab-bar::-webkit-scrollbar{height:0}
+.tab-btn{
+  font-family:var(--ff);font-size:0.75rem;letter-spacing:0.12em;text-transform:uppercase;
+  background:none;border:none;color:var(--text2);padding:0.7rem 1rem;cursor:pointer;
+  white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-1px;
+  transition:color 0.2s,border-color 0.2s;
+}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold)}
+.tab-badge{
+  display:inline-block;background:var(--red);color:#fff;
+  font-size:0.55rem;border-radius:8px;padding:0 4px;margin-left:4px;vertical-align:middle;
+  font-family:var(--ff);
+}
+
+/* ── CONTENT ── */
+#content{max-width:960px;margin:0 auto;padding:1rem}
+.tab-pane{display:none}
+.tab-pane.active{display:block}
+
+/* ── SECTION HEADER ── */
+.sec-hdr{
+  display:flex;align-items:center;gap:0.6rem;
+  border-bottom:1px solid var(--border);
+  padding-bottom:0.5rem;margin-bottom:1rem;
+}
+.sec-hdr h2{font-family:var(--ff);font-size:0.8rem;letter-spacing:0.2em;color:var(--gold3);text-transform:uppercase}
+.sec-hdr .sec-icon{font-size:1rem}
+
+/* ── GRID ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:0.8rem}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:0.8rem}
+@media(max-width:600px){.g2,.g3{grid-template-columns:1fr}}
+
+/* ── CARD ── */
+.card{background:var(--panel);border:1px solid var(--border);border-radius:4px;overflow:hidden}
+.card-hdr{background:rgba(0,0,0,0.3);border-bottom:1px solid var(--border);padding:0.55rem 0.9rem;display:flex;align-items:center;justify-content:space-between}
+.card-hdr h3{font-family:var(--ff);font-size:0.72rem;letter-spacing:0.15em;color:var(--text2);text-transform:uppercase}
+.card-body{padding:0.9rem}
+
+/* ── BUTTONS ── */
+.btn{
+  font-family:var(--ff);font-size:0.75rem;letter-spacing:0.1em;text-transform:uppercase;
+  border:none;border-radius:3px;padding:0.55rem 0.9rem;
+  cursor:pointer;transition:all 0.15s;display:inline-flex;align-items:center;gap:0.4rem;
+}
+.btn:active{transform:scale(0.97)}
+.btn:disabled{opacity:0.3;cursor:not-allowed;transform:none!important}
+.btn-gold{background:linear-gradient(135deg,#7a5a08,#c9960e);color:#0c0800;font-weight:700}
+.btn-gold:hover:not(:disabled){box-shadow:0 0 14px rgba(212,160,23,0.5)}
+.btn-red{background:var(--red3);color:#f5a0a0;border:1px solid var(--red)}
+.btn-red:hover:not(:disabled){background:var(--red);color:#fff;box-shadow:0 0 14px rgba(192,57,43,0.4)}
+.btn-blue{background:#0e2a40;color:#90caf9;border:1px solid var(--blue)}
+.btn-blue:hover:not(:disabled){background:var(--blue);color:#fff}
+.btn-green{background:#0e2a18;color:#a5d6a7;border:1px solid var(--green)}
+.btn-green:hover:not(:disabled){background:var(--green);color:#fff}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border)}
+.btn-ghost:hover:not(:disabled){border-color:var(--border2);color:var(--text)}
+.btn-sm{padding:0.35rem 0.65rem;font-size:0.68rem}
+.btn-lg{padding:0.75rem 1.4rem;font-size:0.85rem;width:100%}
+.btn-block{width:100%;justify-content:center}
+
+/* ── JOB ROWS ── */
+.job-list{display:flex;flex-direction:column;gap:0.5rem}
+.job-row{
+  display:grid;grid-template-columns:auto 1fr auto auto;
+  gap:0.7rem;align-items:center;
+  background:var(--panel2);border:1px solid var(--border);border-radius:3px;padding:0.6rem 0.8rem;
+  transition:border-color 0.2s;
+}
+.job-row:hover:not(.locked){border-color:var(--border2)}
+.job-row.locked{opacity:0.35}
+.job-icon{font-size:1.5rem;line-height:1}
+.job-name{font-family:var(--ff);font-size:0.88rem;font-weight:600;color:var(--white)}
+.job-meta{font-size:0.72rem;color:var(--text2);margin-top:0.1rem}
+.job-meta .highlight{color:var(--gold)}
+.job-meta .cost-e{color:#f0a050}
+.job-req{font-family:var(--ff);font-size:0.6rem;letter-spacing:0.1em;color:var(--text3);text-transform:uppercase}
+
+/* ── ENERGY DISPLAY ── */
+.energy-display{
+  background:var(--panel2);border:1px solid var(--border);border-radius:4px;
+  padding:1rem;text-align:center;margin-bottom:1rem;
+}
+.energy-display .big{font-family:var(--ff);font-size:2.5rem;font-weight:700;color:var(--gold2);line-height:1}
+.energy-display .big span{font-size:1rem;color:var(--text2)}
+.energy-display .bar{height:8px;background:var(--border);border-radius:4px;margin:0.5rem 0;overflow:hidden}
+.energy-display .bar-inner{height:100%;border-radius:4px;background:linear-gradient(90deg,#d4a017,#f0c040);transition:width 0.5s}
+.energy-display .regen-txt{font-family:var(--fmono);font-size:0.78rem;color:var(--text2)}
+.energy-display .regen-txt.ticking{color:var(--gold)}
+
+/* ── REST TIMER ── */
+.rest-panel{
+  background:linear-gradient(135deg,#1a1000,#221800);
+  border:1px solid var(--gold3);border-radius:4px;padding:1rem;text-align:center;margin-bottom:1rem;
+}
+.rest-panel .rest-title{font-family:var(--ff);font-size:0.7rem;letter-spacing:0.2em;color:var(--gold3);text-transform:uppercase;margin-bottom:0.5rem}
+.rest-timer{font-family:var(--fmono);font-size:2rem;color:var(--gold2);letter-spacing:0.1em}
+.rest-panel .rest-info{font-size:0.75rem;color:var(--text2);margin-top:0.4rem}
+
+/* ── FIGHT LIST ── */
+.fight-list{display:flex;flex-direction:column;gap:0.5rem}
+.fight-row{
+  background:var(--panel2);border:1px solid var(--border);border-radius:4px;
+  padding:0.7rem 0.9rem;display:grid;grid-template-columns:auto 1fr auto auto;gap:0.7rem;align-items:center;
+  transition:border-color 0.2s;
+}
+.fight-row:hover{border-color:var(--border2)}
+.fight-avatar{width:38px;height:38px;border-radius:50%;background:var(--border2);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+.fight-name{font-family:var(--ff);font-size:0.9rem;color:var(--white);font-weight:600}
+.fight-info{font-size:0.72rem;color:var(--text2);margin-top:0.1rem}
+.fight-info .badge-lvl{
+  background:var(--border2);color:var(--text);
+  font-family:var(--ff);font-size:0.6rem;letter-spacing:0.1em;
+  border-radius:2px;padding:1px 5px;margin-right:4px;
+}
+.fight-info .badge-gang{color:var(--red2)}
+.fight-power{font-family:var(--fmono);font-size:0.8rem;text-align:right}
+.fight-power .pow-label{font-size:0.6rem;color:var(--text2);display:block;font-family:var(--ff)}
+.fight-power .pow-val{color:var(--gold)}
+.fight-btns{display:flex;gap:0.4rem}
+
+/* ── COMBAT RESULT MODAL ── */
+#combat-modal{
+  position:fixed;inset:0;z-index:500;
+  display:none;align-items:center;justify-content:center;
+  background:rgba(0,0,0,0.8);backdrop-filter:blur(4px);
+}
+#combat-modal.open{display:flex}
+.combat-box{
+  background:var(--panel);border:1px solid var(--border2);border-radius:6px;
+  padding:2rem;max-width:400px;width:90%;text-align:center;
+  animation:pop-in 0.25s ease;
+}
+@keyframes pop-in{from{transform:scale(0.85);opacity:0}to{transform:scale(1);opacity:1}}
+.combat-box .result-icon{font-size:3rem;margin-bottom:0.5rem}
+.combat-box h2{font-family:var(--ff);font-size:1.4rem;letter-spacing:0.1em;margin-bottom:0.5rem}
+.combat-box.win h2{color:var(--gold2)}
+.combat-box.lose h2{color:var(--red2)}
+.combat-box .result-detail{font-size:0.88rem;color:var(--text2);line-height:1.6;margin-bottom:1.2rem}
+.combat-box .result-detail strong{color:var(--text)}
+
+/* ── PROPERTIES ── */
+.prop-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0.7rem}
+.prop-card{
+  background:var(--panel2);border:1px solid var(--border);border-radius:4px;padding:0.8rem;
+  transition:border-color 0.2s;
+}
+.prop-card:hover{border-color:var(--border2)}
+.prop-card .prop-icon{font-size:1.8rem;margin-bottom:0.4rem}
+.prop-card .prop-name{font-family:var(--ff);font-size:0.85rem;color:var(--white);font-weight:600}
+.prop-card .prop-desc{font-size:0.72rem;color:var(--text2);margin:0.2rem 0 0.5rem}
+.prop-card .prop-owned{font-family:var(--fmono);font-size:0.78rem;color:var(--gold);margin-bottom:0.5rem}
+.prop-card .prop-income{font-size:0.72rem;color:var(--green2)}
+.prop-income-bar{margin:0.5rem 0;height:4px;background:var(--border);border-radius:2px}
+.prop-income-bar-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--green2));border-radius:2px;transition:width 0.4s}
+
+/* ── CREW / STATS ── */
+.stat-table{width:100%;border-collapse:collapse;font-size:0.85rem}
+.stat-table tr{border-bottom:1px solid var(--border)}
+.stat-table td{padding:0.5rem 0.6rem;color:var(--text2)}
+.stat-table td:first-child{color:var(--text);font-family:var(--ff);font-size:0.75rem;letter-spacing:0.1em;text-transform:uppercase;width:45%}
+.stat-table td:last-child{color:var(--gold);font-family:var(--fmono);text-align:right}
+.stat-table tr.highlight-row td{color:var(--gold2)}
+
+/* ── LOG ── */
+#log-box{
+  background:var(--bg);border:1px solid var(--border);border-radius:3px;
+  padding:0.7rem;height:200px;overflow-y:auto;font-family:var(--fmono);font-size:0.75rem;line-height:1.7;
+}
+.le{animation:fade-sl 0.3s ease}
+@keyframes fade-sl{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
+.le-win{color:var(--gold2)}
+.le-lose{color:var(--red2)}
+.le-info{color:var(--text2)}
+.le-lvl{color:#f0c040;font-weight:700}
+.le-prop{color:var(--green2)}
+.le-time{color:var(--text3);margin-right:0.4rem}
+
+/* ── TOAST ── */
+#toast{
+  position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(10px);
+  background:var(--panel2);border:1px solid var(--border2);border-radius:4px;
+  padding:0.6rem 1.2rem;font-family:var(--ff);font-size:0.8rem;letter-spacing:0.08em;
+  color:var(--text);opacity:0;transition:opacity 0.25s,transform 0.25s;pointer-events:none;
+  z-index:999;box-shadow:0 8px 30px rgba(0,0,0,0.7);white-space:nowrap;
+}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── LEVEL SPLASH ── */
+#lvl-splash{
+  position:fixed;inset:0;z-index:800;display:flex;align-items:center;justify-content:center;
+  pointer-events:none;opacity:0;transition:opacity 0.3s;
+  background:rgba(0,0,0,0.7);backdrop-filter:blur(2px);
+}
+#lvl-splash.on{opacity:1}
+.lvl-inner{text-align:center;animation:lvl-anim 2.2s ease forwards}
+@keyframes lvl-anim{
+  0%{transform:scale(0.5);opacity:0}
+  15%{transform:scale(1.1);opacity:1}
+  75%{transform:scale(1);opacity:1}
+  100%{transform:scale(1.15);opacity:0}
+}
+.lvl-inner .lvl-big{font-family:var(--ff);font-size:clamp(3rem,12vw,7rem);color:var(--gold2);text-shadow:0 0 80px rgba(240,192,64,0.9),0 0 30px rgba(240,192,64,0.6);display:block}
+.lvl-inner .lvl-sub{font-family:var(--ff);font-size:1rem;letter-spacing:0.4em;color:var(--white);text-transform:uppercase;margin-top:0.3rem}
+
+/* ── MISC ── */
+.sep{height:1px;background:var(--border);margin:0.8rem 0}
+.tag{display:inline-block;background:var(--border2);color:var(--text2);font-family:var(--ff);font-size:0.6rem;letter-spacing:0.1em;border-radius:2px;padding:1px 6px;text-transform:uppercase}
+.tag-red{background:var(--red3);color:#f5a0a0}
+.tag-gold{background:var(--gold3);color:var(--gold2)}
+.tag-green{background:#0a2010;color:var(--green2)}
+.tag-blue{background:#0a1a28;color:var(--blue2)}
+.mt05{margin-top:0.5rem}
+.mt1{margin-top:1rem}
+.flex-sb{display:flex;justify-content:space-between;align-items:center}
+.income-ticker{font-family:var(--fmono);font-size:0.7rem;color:var(--green2);letter-spacing:0.05em}
+.gang-name{font-family:var(--ff);font-size:0.7rem;letter-spacing:0.05em;color:var(--red2)}
+
+/* ── ATTACK STYLE ── */
+.atk-detail{
+  display:grid;grid-template-columns:1fr auto 1fr;gap:0.5rem;align-items:center;margin:1rem 0;
+  padding:0.8rem;background:var(--bg);border-radius:4px;border:1px solid var(--border);
+}
+.atk-side{text-align:center}
+.atk-side .atk-name{font-family:var(--ff);font-size:0.9rem;color:var(--white);font-weight:600}
+.atk-side .atk-pow{font-family:var(--fmono);font-size:1.2rem;color:var(--gold)}
+.atk-side .atk-label{font-size:0.65rem;color:var(--text2);font-family:var(--ff);letter-spacing:0.1em;text-transform:uppercase}
+.atk-vs{font-family:var(--ff);font-size:1.2rem;color:var(--red2);text-align:center;font-weight:700}
+
+.reset-link{display:block;text-align:center;font-family:var(--ff);font-size:0.6rem;letter-spacing:0.15em;color:var(--text3);text-transform:uppercase;margin-top:2rem;cursor:pointer;transition:color 0.2s}
+.reset-link:hover{color:var(--red2)}
+
+/* ── HOSPITAL INDICATOR ── */
+.hosp-warn{
+  background:linear-gradient(135deg,#1a0808,#220e0e);border:1px solid var(--red);
+  border-radius:4px;padding:0.7rem 1rem;margin-bottom:0.8rem;
+  display:flex;align-items:center;gap:0.7rem;
+}
+.hosp-warn p{font-family:var(--ff);font-size:0.78rem;color:#f5a0a0;letter-spacing:0.05em}
+.hosp-warn .hosp-timer{font-family:var(--fmono);color:var(--red2);font-size:0.85rem;margin-left:auto}
+</style>
+</head>
+<body>
+
+<!-- SETUP SCREEN -->
+<div id="setup">
+  <div class="logo-icon">🔫</div>
+  <h1>Mafia Gang Wars</h1>
+  <div class="setup-sub">Build your empire. Crush your rivals.</div>
+  <div id="setup-form">
+    <label for="name-inp">Your Mob Name</label>
+    <input id="name-inp" type="text" maxlength="20" placeholder="e.g. The Godfather" autocomplete="off">
+    <label for="gang-inp" style="margin-top:0.2rem">Your Gang Name</label>
+    <input id="gang-inp" type="text" maxlength="20" placeholder="e.g. The Five Families" autocomplete="off" style="width:100%;background:var(--panel);border:1px solid var(--border2);border-radius:3px;color:var(--white);font-family:var(--ff);font-size:1.1rem;letter-spacing:0.1em;padding:0.75rem 1rem;outline:none;transition:border-color 0.2s,box-shadow 0.2s">
+    <button class="setup-btn" onclick="startGame()">🔫 Enter The Streets</button>
+  </div>
+</div>
+
+<!-- LEVEL SPLASH -->
+<div id="lvl-splash"><div class="lvl-inner"><span class="lvl-big">LEVEL UP</span><div class="lvl-sub">Your crew grows stronger</div></div></div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- COMBAT MODAL -->
+<div id="combat-modal">
+  <div class="combat-box" id="combat-box">
+    <div class="result-icon" id="cm-icon"></div>
+    <h2 id="cm-title"></h2>
+    <div class="atk-detail" id="cm-vs"></div>
+    <div class="result-detail" id="cm-detail"></div>
+    <button class="btn btn-gold" onclick="closeCombat()">Continue</button>
+  </div>
+</div>
+
+<!-- HEADER -->
+<div id="hdr">
+  <div class="logo">Mafia <span>Gang</span> Wars</div>
+  <div id="hdr-stats">
+    <div class="hdr-stat">
+      <div class="hs-label">💰 Cash</div>
+      <div class="hs-val" id="hdr-money">$0</div>
+    </div>
+    <div class="hdr-stat">
+      <div class="hs-label">⚡ Energy</div>
+      <div class="hs-val" id="hdr-energy">100/100</div>
+      <div class="hs-bar"><div class="hs-bar-fill eb-fill" id="hdr-ebar" style="width:100%"></div></div>
+    </div>
+    <div class="hdr-stat">
+      <div class="hs-label">❤️ Health</div>
+      <div class="hs-val" id="hdr-health">100/100</div>
+      <div class="hs-bar"><div class="hs-bar-fill hb-fill" id="hdr-hbar" style="width:100%"></div></div>
+    </div>
+    <div class="hdr-stat">
+      <div class="hs-label">⭐ Level</div>
+      <div class="hs-val" id="hdr-level">1</div>
+    </div>
+    <div class="hdr-stat">
+      <div class="hs-label">XP</div>
+      <div class="hs-val" id="hdr-xp">0</div>
+      <div class="hs-bar"><div class="hs-bar-fill xb-fill" id="hdr-xbar" style="width:0%"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB BAR -->
+<div id="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('jobs',this)">💼 Jobs</button>
+  <button class="tab-btn" onclick="switchTab('fight',this)">🔫 Fight<span class="tab-badge" id="badge-fight">!</span></button>
+  <button class="tab-btn" onclick="switchTab('properties',this)">🏢 Properties</button>
+  <button class="tab-btn" onclick="switchTab('crew',this)">👥 Crew</button>
+  <button class="tab-btn" onclick="switchTab('stats',this)">📊 Stats</button>
+</div>
+
+<!-- CONTENT -->
+<div id="content">
+
+  <!-- ── JOBS TAB ── -->
+  <div class="tab-pane active" id="tab-jobs">
+    <div id="hosp-warn" class="hosp-warn" style="display:none">
+      <span style="font-size:1.4rem">🏥</span>
+      <p>You're in the hospital recovering from a beating.</p>
+      <div class="hosp-timer" id="hosp-timer-txt">--:--</div>
+    </div>
+    <!-- Energy -->
+    <div class="energy-display">
+      <div class="big"><span id="e-num">100</span><span>/100</span></div>
+      <div style="font-family:var(--ff);font-size:0.65rem;letter-spacing:0.2em;color:var(--text2);text-transform:uppercase;margin:0.2rem 0">⚡ Energy</div>
+      <div class="bar"><div class="bar-inner" id="e-bar" style="width:100%"></div></div>
+      <div class="regen-txt" id="e-regen">+1 energy every 5 minutes</div>
+    </div>
+    <!-- Rest panel -->
+    <div class="rest-panel" id="rest-panel" style="display:none">
+      <div class="rest-title">🛌 Resting — Full energy in:</div>
+      <div class="rest-timer" id="rest-timer-txt">1:00:00</div>
+      <div class="rest-info">You cannot perform jobs while resting. You can cancel early.</div>
+      <button class="btn btn-ghost btn-sm mt05" onclick="cancelRest()">Cancel Rest</button>
+    </div>
+    <button class="btn btn-ghost btn-block" id="btn-rest" onclick="doRest()" style="margin-bottom:1rem">🛌 Rest (Restores full energy over 1 hour)</button>
+
+    <!-- Jobs -->
+    <div class="sec-hdr"><span class="sec-icon">💼</span><h2>Criminal Jobs</h2></div>
+    <div class="job-list" id="job-list"></div>
+    <!-- Log -->
+    <div class="sec-hdr mt1"><span class="sec-icon">📜</span><h2>Activity Log</h2></div>
+    <div id="log-box"></div>
+  </div>
+
+  <!-- ── FIGHT TAB ── -->
+  <div class="tab-pane" id="tab-fight">
+    <div class="sec-hdr"><span class="sec-icon">🔫</span><h2>Fight List</h2>
+      <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="refreshFightList()">🔄 Refresh</button>
+    </div>
+    <p style="font-size:0.78rem;color:var(--text2);margin-bottom:0.8rem">
+      Real players near your level + AI gang members fill the list. Win fights to earn cash &amp; XP. Lose and end up in hospital.
+    </p>
+    <!-- Health display -->
+    <div class="card" style="margin-bottom:0.8rem">
+      <div class="card-body" style="display:flex;align-items:center;gap:1rem;padding:0.8rem 1rem">
+        <div style="flex:1">
+          <div style="font-family:var(--ff);font-size:0.65rem;letter-spacing:0.15em;color:var(--text2);text-transform:uppercase;margin-bottom:0.3rem">❤️ Health</div>
+          <div style="height:8px;background:var(--border);border-radius:4px;overflow:hidden">
+            <div id="h-bar" style="height:100%;border-radius:4px;background:linear-gradient(90deg,#c0392b,#e74c3c);transition:width 0.5s;width:100%"></div>
+          </div>
+        </div>
+        <div style="font-family:var(--fmono);font-size:1.1rem;color:var(--red2)"><span id="h-num">100</span><span style="font-size:0.75rem;color:var(--text2)">/100</span></div>
+        <button class="btn btn-green btn-sm" onclick="doHeal()" id="btn-heal">💊 Heal ($200)</button>
+      </div>
+    </div>
+    <div class="fight-list" id="fight-list"></div>
+  </div>
+
+  <!-- ── PROPERTIES TAB ── -->
+  <div class="tab-pane" id="tab-properties">
+    <div class="sec-hdr"><span class="sec-icon">🏢</span><h2>Criminal Empire</h2></div>
+    <div class="flex-sb" style="margin-bottom:0.8rem;flex-wrap:wrap;gap:0.5rem">
+      <p style="font-size:0.78rem;color:var(--text2)">Properties generate income automatically. Collect every few minutes.</p>
+      <div style="display:flex;gap:0.6rem;align-items:center">
+        <span class="income-ticker" id="income-ticker">Income: $0/hr</span>
+        <button class="btn btn-gold btn-sm" onclick="collectIncome()" id="btn-collect">💰 Collect All</button>
+      </div>
+    </div>
+    <div class="prop-grid" id="prop-grid"></div>
+  </div>
+
+  <!-- ── CREW TAB ── -->
+  <div class="tab-pane" id="tab-crew">
+    <div class="sec-hdr"><span class="sec-icon">👥</span><h2>Your Crew</h2></div>
+    <div class="g2">
+      <div class="card">
+        <div class="card-hdr"><h3>Crew Members</h3><span class="tag tag-gold" id="crew-count-tag">0 Soldiers</span></div>
+        <div class="card-body">
+          <p style="font-size:0.8rem;color:var(--text2);margin-bottom:0.8rem">Each crew member boosts your attack &amp; defense power. More crew = stronger gang.</p>
+          <div id="crew-list" style="display:flex;flex-direction:column;gap:0.5rem"></div>
+          <div class="sep"></div>
+          <div id="crew-hire" style="display:flex;flex-direction:column;gap:0.5rem"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-hdr"><h3>Gang Perks</h3></div>
+        <div class="card-body">
+          <p style="font-size:0.78rem;color:var(--text2);margin-bottom:0.8rem">Unlock bonuses for your gang as you grow.</p>
+          <div id="perk-list" style="display:flex;flex-direction:column;gap:0.6rem"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STATS TAB ── -->
+  <div class="tab-pane" id="tab-stats">
+    <div class="g2">
+      <div class="card">
+        <div class="card-hdr"><h3>Player Profile</h3></div>
+        <div class="card-body">
+          <table class="stat-table" id="profile-table"></table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-hdr"><h3>Combat Record</h3></div>
+        <div class="card-body">
+          <table class="stat-table" id="combat-table"></table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-hdr"><h3>Wealth</h3></div>
+        <div class="card-body">
+          <table class="stat-table" id="wealth-table"></table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-hdr"><h3>Job History</h3></div>
+        <div class="card-body">
+          <table class="stat-table" id="jobs-table"></table>
+        </div>
+      </div>
+    </div>
+    <span class="reset-link" onclick="resetGame()">⚠ Reset All Progress</span>
+  </div>
+
+</div><!-- /content -->
+
+<script>
+// ═══════════════════════════════════════
+//  CONSTANTS
+// ═══════════════════════════════════════
+
+const TITLES = ['Street Rat','Thug','Enforcer','Soldier','Made Man','Lieutenant','Capo','Underboss','Consigliere','Boss','Don','Il Padrino'];
+
+const JOBS_DATA = [
+  {id:0, name:'Run Numbers',          icon:'🎲', city:'New York',  energy:3,  minPay:30,   maxPay:70,   xp:6,   lvlReq:1},
+  {id:1, name:'Pickpocket Tourists',  icon:'👜', city:'New York',  energy:4,  minPay:50,   maxPay:100,  xp:9,   lvlReq:1},
+  {id:2, name:'Boost Cars',           icon:'🚗', city:'New York',  energy:5,  minPay:80,   maxPay:150,  xp:13,  lvlReq:2},
+  {id:3, name:'Collect Protection',   icon:'🔪', city:'Chicago',   energy:7,  minPay:130,  maxPay:220,  xp:20,  lvlReq:3},
+  {id:4, name:'Smuggle Liquor',       icon:'🥃', city:'Chicago',   energy:8,  minPay:180,  maxPay:300,  xp:27,  lvlReq:4},
+  {id:5, name:'Rob an Armored Car',   icon:'🚐', city:'Chicago',   energy:12, minPay:300,  maxPay:500,  xp:45,  lvlReq:5},
+  {id:6, name:'Hit a Casino',         icon:'🎰', city:'Las Vegas', energy:15, minPay:500,  maxPay:900,  xp:70,  lvlReq:7},
+  {id:7, name:'Smuggle Weapons',      icon:'🔫', city:'Las Vegas', energy:18, minPay:700,  maxPay:1200, xp:95,  lvlReq:8},
+  {id:8, name:'Rob a Bank',           icon:'🏦', city:'Miami',     energy:22, minPay:1200, maxPay:2000, xp:140, lvlReq:10},
+  {id:9, name:'Orchestrate Heist',    icon:'💎', city:'Miami',     energy:30, minPay:2000, maxPay:3500, xp:220, lvlReq:13},
+  {id:10,name:'Money Laundering Op',  icon:'💸', city:'Miami',     energy:25, minPay:1600, maxPay:2800, xp:175, lvlReq:11},
+  {id:11,name:'Offshore Drug Deal',   icon:'🚢', city:'Cuba',      energy:40, minPay:4000, maxPay:7000, xp:400, lvlReq:16},
+];
+
+// AI GANGS — used to fill fight list at low levels & as padding
+const AI_GANGS = [
+  {name:'The Bloods',      gang:'Bloods',          icon:'🔴', baseAtk:18, baseDef:14, baseLvl:1},
+  {name:'Sal "The Rat"',   gang:'Five Boroughs',   icon:'🐀', baseAtk:22, baseDef:18, baseLvl:2},
+  {name:'Big Tiny',        gang:'East Side Kings', icon:'👊', baseAtk:28, baseDef:24, baseLvl:3},
+  {name:'Carmine Russo',   gang:'The Commission',  icon:'🤵', baseAtk:36, baseDef:30, baseLvl:5},
+  {name:'The Bricklayer',  gang:'Westside Mob',    icon:'🧱', baseAtk:50, baseDef:42, baseLvl:7},
+  {name:'Donatella Ricci', gang:'La Cosa Nostra',  icon:'🌹', baseAtk:65, baseDef:58, baseLvl:10},
+  {name:'Don Moretti',     gang:'The Syndicate',   icon:'🎩', baseAtk:85, baseDef:75, baseLvl:13},
+  {name:'Il Serpente',     gang:'Sicilian Mob',    icon:'🐍', baseAtk:110,baseDef:95, baseLvl:16},
+  {name:'Ghost Franco',    gang:'The Shadows',     icon:'👤', baseAtk:145,baseDef:130,baseLvl:20},
+];
+
+// Simulated player names for fight list
+const SIM_PLAYER_NAMES = ['xXKillerXx','MobBoss99','Scarface_Jr','TheDonaldo','Vito_G','BigPauly','LilCaesarr','Icepick_Mike','Jersey_Tony','CasinoKing','NightRider_','StuckOnEight','GunMetalGray','BloodyKnucks','WireframeDon','SlickRick_mob','DeSantis_777'];
+const SIM_GANG_NAMES   = ['West Coast Mob','Death Row Gang','Street Phantoms','Iron Circle','The Untouchables','Red Hand Clan','The Outfit','Black Market Kings','Harbor Syndicate','The Cartel Kings'];
+
+const PROPERTIES = [
+  {id:0, name:'Street Corner',   icon:'🏪', cost:500,   baseIncome:50,   lvlReq:1,  desc:'Small-time numbers operation'},
+  {id:1, name:'Chop Shop',       icon:'🔧', cost:2000,  baseIncome:180,  lvlReq:2,  desc:'Strips stolen cars for parts'},
+  {id:2, name:'Speakeasy',       icon:'🥃', cost:5000,  baseIncome:400,  lvlReq:3,  desc:'Underground bar with back-room deals'},
+  {id:3, name:'Weapons Cache',   icon:'🔫', cost:12000, baseIncome:900,  lvlReq:5,  desc:'Arms dealing to other gangs'},
+  {id:4, name:'Casino Front',    icon:'🎰', cost:30000, baseIncome:2200, lvlReq:7,  desc:'Launders cash through gambling'},
+  {id:5, name:'Dockside Warehouse',icon:'🚢',cost:75000,baseIncome:5500, lvlReq:10, desc:'Smuggling hub for imports/exports'},
+  {id:6, name:'Offshore Account', icon:'🏦', cost:200000,baseIncome:14000,lvlReq:15, desc:'Clean money, no questions asked'},
+];
+
+const CREW_TYPES = [
+  {id:0, name:'Street Muscle',  icon:'💪', cost:500,   atk:5,  def:3,  lvlReq:1},
+  {id:1, name:'Getaway Driver', icon:'🚗', cost:1500,  atk:3,  def:8,  lvlReq:2},
+  {id:2, name:'Hitman',         icon:'🔫', cost:5000,  atk:20, def:5,  lvlReq:5},
+  {id:3, name:'Enforcer',       icon:'🪬', cost:8000,  atk:15, def:18, lvlReq:6},
+  {id:4, name:'Consigliere',    icon:'🤵', cost:25000, atk:30, def:30, lvlReq:10},
+];
+
+const PERKS = [
+  {id:0, name:'Street Cred',      desc:'+10% job payouts',        cost:3000,   lvlReq:3,  effect:'pay'},
+  {id:1, name:'Intimidation',     desc:'+15% attack power',       cost:8000,   lvlReq:5,  effect:'atk'},
+  {id:2, name:'Armor Up',         desc:'+15% defense power',      cost:8000,   lvlReq:5,  effect:'def'},
+  {id:3, name:'Laundering Ring',  desc:'+20% property income',    cost:20000,  lvlReq:8,  effect:'income'},
+  {id:4, name:'Iron Will',        desc:'+50 max health',          cost:50000,  lvlReq:12, effect:'hp'},
+  {id:5, name:'Energy Drink Cartel',desc:'+25 max energy',        cost:50000,  lvlReq:12, effect:'energy'},
+];
+
+// ═══════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════
+
+const SAVE_KEY = 'mafiaGangWars_v3';
+
+function defaultState() {
+  return {
+    name:        'Don',
+    gangName:    'The Family',
+    level:       1,
+    xp:          0,
+    money:       250,
+    energy:      100,
+    health:      100,
+    // timers
+    lastSeen:    Date.now(),
+    lastEnergyTick: Date.now(),
+    lastIncomeTick: Date.now(),
+    restEndTime: 0,       // 0 = not resting; timestamp = when rest ends
+    hospEndTime: 0,       // 0 = not hospitalised
+    // combat
+    wins:        0,
+    losses:      0,
+    respect:     0,
+    // economy
+    totalEarned: 0,
+    totalJobs:   0,
+    propOwned:   {},      // {propId: count}
+    crewOwned:   {},      // {crewId: count}
+    perksOwned:  [],      // [perkId,...]
+    // derived (computed on load)
+    maxEnergy:   100,
+    maxHealth:   100,
+    // fight list seed (refreshed on demand)
+    fightSeed:   Math.random(),
+  };
+}
+
+let S = defaultState();
+
+function xpNeeded(lvl) { return Math.round(100 * Math.pow(lvl, 1.6)); }
+
+// ─── DERIVED STATS ───
+function playerAtk() {
+  let base = 10 + S.level * 3;
+  Object.entries(S.crewOwned).forEach(([id,cnt]) => {
+    const c = CREW_TYPES[+id]; if(c) base += c.atk * cnt;
+  });
+  if(S.perksOwned.includes(1)) base = Math.round(base * 1.15);
+  return base;
+}
+function playerDef() {
+  let base = 8 + S.level * 2;
+  Object.entries(S.crewOwned).forEach(([id,cnt]) => {
+    const c = CREW_TYPES[+id]; if(c) base += c.def * cnt;
+  });
+  if(S.perksOwned.includes(2)) base = Math.round(base * 1.15);
+  return base;
+}
+function payMulti() {
+  let m = 1 + (S.level - 1) * 0.15;
+  if(S.perksOwned.includes(0)) m *= 1.10;
+  return m;
+}
+function incomeMulti() {
+  let m = 1;
+  if(S.perksOwned.includes(3)) m *= 1.20;
+  return m;
+}
+function totalIncome() { // per hour
+  let inc = 0;
+  Object.entries(S.propOwned).forEach(([id,cnt]) => {
+    const p = PROPERTIES[+id]; if(p) inc += p.baseIncome * cnt;
+  });
+  return Math.round(inc * incomeMulti());
+}
+function totalCrew() {
+  return Object.values(S.crewOwned).reduce((a,b)=>a+b,0);
+}
+function maxEnergy() { return S.perksOwned.includes(5) ? 125 : 100; }
+function maxHealth()  { return S.perksOwned.includes(4) ? 150 : 100; }
+
+// ─── SAVE / LOAD ───
+function save() {
+  S.lastSeen = Date.now();
+  localStorage.setItem(SAVE_KEY, JSON.stringify(S));
+}
+function load() {
+  const raw = localStorage.getItem(SAVE_KEY);
+  if (!raw) return false;
+  try {
+    const saved = JSON.parse(raw);
+    S = Object.assign(defaultState(), saved);
+    // Offline catch-up (energy)
+    if (!S.restEndTime || S.restEndTime <= Date.now()) {
+      const elapsed = (Date.now() - (S.lastEnergyTick||Date.now())) / 1000;
+      const ticks   = Math.floor(elapsed / (5*60)); // 1 per 5 min
+      const ME = maxEnergy();
+      S.energy = Math.min(ME, (S.energy||0) + ticks);
+      if(ticks>0) S.lastEnergyTick = Date.now() - ((elapsed % (5*60))*1000);
+    }
+    // Offline income
+    const incElapsed = (Date.now() - (S.lastIncomeTick||Date.now())) / 1000;
+    const incHours   = incElapsed / 3600;
+    const earned     = Math.floor(totalIncome() * incHours);
+    if(earned > 0) { S.money += earned; S.totalEarned += earned; }
+    S.lastIncomeTick = Date.now();
+    return true;
+  } catch(e) { console.warn(e); return false; }
+}
+
+// ═══════════════════════════════════════
+//  RENDER
+// ═══════════════════════════════════════
+
+function render() {
+  const ME = maxEnergy(), MH = maxHealth();
+  const ePct = (S.energy / ME) * 100;
+  const hPct = (S.health / MH) * 100;
+  const xpN  = xpNeeded(S.level);
+  const xPct = Math.min(100, (S.xp / xpN) * 100);
+
+  // header
+  set('hdr-money',  '$' + S.money.toLocaleString());
+  set('hdr-energy', S.energy + '/' + ME);
+  set('hdr-health', S.health + '/' + MH);
+  set('hdr-level',  S.level);
+  set('hdr-xp',     S.xp + '/' + xpN);
+  pct('hdr-ebar', ePct); pct('hdr-hbar', hPct); pct('hdr-xbar', xPct);
+
+  // jobs tab energy
+  set('e-num', S.energy);
+  pct('e-bar', ePct);
+
+  // fight tab health
+  set('h-num', S.health);
+  pct('h-bar', hPct);
+  const healBtn = document.getElementById('btn-heal');
+  if(healBtn) healBtn.disabled = S.health >= MH || S.money < 200;
+
+  renderRestPanel();
+  renderHospWarn();
+  renderJobs();
+  renderFightBadge();
+  renderProperties();
+  renderCrew();
+  renderStats();
+}
+
+function set(id, val) { try { const el = document.getElementById(id); if(el) el.textContent = val; } catch(e){} }
+function pct(id, p)   { try { const el = document.getElementById(id); if(el) el.style.width = Math.max(0,Math.min(100,p))+'%'; } catch(e){} }
+
+function renderRestPanel() {
+  const resting = S.restEndTime > Date.now();
+  const restBtn = document.getElementById('btn-rest');
+  const restPanel = document.getElementById('rest-panel');
+  if(restBtn)   restBtn.style.display  = resting ? 'none' : 'flex';
+  if(restPanel) restPanel.style.display = resting ? 'block' : 'none';
+}
+
+function renderHospWarn() {
+  const inHosp = S.hospEndTime > Date.now();
+  const hw = document.getElementById('hosp-warn');
+  if(hw) hw.style.display = inHosp ? 'flex' : 'none';
+}
+
+function renderJobs() {
+  const list = document.getElementById('job-list');
+  if(!list) return;
+  list.innerHTML = '';
+  const resting  = S.restEndTime > Date.now();
+  const inHosp   = S.hospEndTime > Date.now();
+  JOBS_DATA.forEach(job => {
+    const locked  = S.level < job.lvlReq;
+    const noEnergy= S.energy < job.energy;
+    const cantDo  = locked || resting || inHosp;
+    const multi   = payMulti();
+    const minP = Math.round(job.minPay * multi);
+    const maxP = Math.round(job.maxPay * multi);
+    const xpG  = Math.round(job.xp * (1 + (S.level-1)*0.12));
+
+    const row = document.createElement('div');
+    row.className = 'job-row' + (locked ? ' locked' : '');
+    row.innerHTML = `
+      <div class="job-icon">${job.icon}</div>
+      <div>
+        <div class="job-name">${job.name}</div>
+        <div class="job-meta">
+          <span class="highlight">$${minP.toLocaleString()}–$${maxP.toLocaleString()}</span>
+          &nbsp;·&nbsp;<span style="color:var(--blue2)">+${xpG} XP</span>
+          &nbsp;·&nbsp;<span class="cost-e">⚡${job.energy}</span>
+          &nbsp;<span class="tag" style="margin-left:4px">${job.city}</span>
+        </div>
+      </div>
+      <div class="job-req">${locked ? 'Lvl '+job.lvlReq+' req.' : ''}</div>
+      <button class="btn btn-gold btn-sm" ${cantDo || noEnergy ? 'disabled' : ''} onclick="doJob(${job.id})">
+        ${resting ? 'Resting' : inHosp ? 'Hospital' : 'Do Job'}
+      </button>
+    `;
+    list.appendChild(row);
+  });
+}
+
+function renderFightBadge() {
+  // badge shows if new fighters available
+  const b = document.getElementById('badge-fight');
+  if(b) b.style.display = 'none'; // always hide after built, just cosmetic
+}
+
+// FIGHT LIST — mix of AI (scaled to level) + simulated players
+let fightListCache = [];
+function buildFightList() {
+  fightListCache = [];
+  const lvl = S.level;
+  const rng  = mulberry32(Math.floor(S.fightSeed * 1e9) + lvl);
+
+  // 3–5 simulated "real" players near level
+  const numReal = 3 + Math.floor(rng() * 3);
+  for(let i=0;i<numReal;i++){
+    const pLvl = Math.max(1, lvl + Math.floor(rng()*5) - 2);
+    const pAtk = Math.round((10 + pLvl*3) * (0.8 + rng()*0.4));
+    const pDef = Math.round((8  + pLvl*2) * (0.8 + rng()*0.4));
+    fightListCache.push({
+      type:    'player',
+      name:    SIM_PLAYER_NAMES[Math.floor(rng()*SIM_PLAYER_NAMES.length)],
+      gang:    SIM_GANG_NAMES[Math.floor(rng()*SIM_GANG_NAMES.length)],
+      icon:    ['😈','🤠','👺','💀','🦅','🐺'][Math.floor(rng()*6)],
+      level:   pLvl,
+      atk:     pAtk,
+      def:     pDef,
+      reward:  Math.round((50 + pLvl * 30) * (0.8+rng()*0.4)),
+      xp:      Math.round((20 + pLvl * 8)  * (0.8+rng()*0.4)),
+    });
+  }
+
+  // 3–6 AI gang members, scaled to level
+  const aiPool = AI_GANGS.filter(a => a.baseLvl <= lvl + 3);
+  const numAI  = 3 + Math.floor(rng() * 4);
+  for(let i=0;i<numAI;i++){
+    const ai = aiPool[Math.floor(rng()*aiPool.length)] || AI_GANGS[0];
+    const scale = 0.9 + rng()*0.3;
+    const aLvl  = Math.max(1, ai.baseLvl + Math.floor(rng()*3));
+    fightListCache.push({
+      type:    'ai',
+      name:    ai.name,
+      gang:    ai.gang,
+      icon:    ai.icon,
+      level:   aLvl,
+      atk:     Math.round(ai.baseAtk * scale),
+      def:     Math.round(ai.baseDef * scale),
+      reward:  Math.round((40 + aLvl * 25) * scale),
+      xp:      Math.round((15 + aLvl * 6)  * scale),
+    });
+  }
+
+  // shuffle
+  fightListCache.sort(() => rng() - 0.5);
+}
+
+function mulberry32(seed) {
+  return function() {
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+function renderFightList() {
+  const list = document.getElementById('fight-list');
+  if(!list) return;
+  if(!fightListCache.length) buildFightList();
+  list.innerHTML = '';
+  fightListCache.forEach((f, idx) => {
+    const myAtk = playerAtk(), myDef = playerDef();
+    const winPct = Math.round(Math.min(95, Math.max(10, (myAtk/(myAtk+f.def))*100)));
+    const diff   = f.atk > myAtk ? 'tag-red' : f.atk < myAtk * 0.8 ? 'tag-green' : 'tag-gold';
+    const diffTx = f.atk > myAtk ? 'Strong' : f.atk < myAtk * 0.8 ? 'Weak' : 'Even';
+    const row = document.createElement('div');
+    row.className = 'fight-row';
+    row.innerHTML = `
+      <div class="fight-avatar">${f.icon}</div>
+      <div>
+        <div class="fight-name">${f.name}</div>
+        <div class="fight-info">
+          <span class="badge-lvl">Lvl ${f.level}</span>
+          <span class="badge-gang">${f.gang}</span>
+          &nbsp;<span class="tag ${diff}">${diffTx}</span>
+          ${f.type==='player' ? '&nbsp;<span class="tag tag-blue">Player</span>' : '&nbsp;<span class="tag">AI</span>'}
+        </div>
+        <div style="font-size:0.7rem;color:var(--text2);margin-top:0.2rem">ATK:${f.atk} DEF:${f.def} · Win chance: ~${winPct}%</div>
+      </div>
+      <div class="fight-power">
+        <span class="pow-label">Reward</span>
+        <span class="pow-val">$${f.reward.toLocaleString()}</span>
+        <div style="font-size:0.65rem;color:var(--blue2)">+${f.xp} XP</div>
+      </div>
+      <div class="fight-btns">
+        <button class="btn btn-red btn-sm" onclick="doFight(${idx},'attack')">⚔ Attack</button>
+      </div>
+    `;
+    list.appendChild(row);
+  });
+}
+
+function renderProperties() {
+  const grid = document.getElementById('prop-grid');
+  if(!grid) return;
+  grid.innerHTML = '';
+  PROPERTIES.forEach(p => {
+    const owned  = S.propOwned[p.id] || 0;
+    const locked = S.level < p.lvlReq;
+    const inc    = Math.round(p.baseIncome * incomeMulti());
+    const maxOwn = 10;
+    const card = document.createElement('div');
+    card.className = 'prop-card' + (locked ? ' locked' : '');
+    card.style.opacity = locked ? '0.4' : '1';
+    card.innerHTML = `
+      <div class="prop-icon">${p.icon}</div>
+      <div class="prop-name">${p.name}</div>
+      <div class="prop-desc">${p.desc}</div>
+      <div class="prop-owned">Owned: ${owned}/${maxOwn}</div>
+      <div class="prop-income">+$${inc.toLocaleString()}/hr each</div>
+      <div class="prop-income-bar"><div class="prop-income-bar-fill" style="width:${(owned/maxOwn)*100}%"></div></div>
+      <div style="display:flex;gap:0.4rem;margin-top:0.5rem;flex-wrap:wrap">
+        <button class="btn btn-gold btn-sm" ${locked||S.money<p.cost||owned>=maxOwn?'disabled':''} onclick="buyProp(${p.id})">
+          💰 Buy ($${p.cost.toLocaleString()})
+        </button>
+        ${locked ? `<span class="tag">Lvl ${p.lvlReq} req.</span>` : ''}
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+  set('income-ticker', 'Income: $'+totalIncome().toLocaleString()+'/hr');
+}
+
+function renderCrew() {
+  const cl = document.getElementById('crew-list');
+  const ch = document.getElementById('crew-hire');
+  const ct = document.getElementById('crew-count-tag');
+  if(!cl||!ch) return;
+
+  cl.innerHTML = '';
+  const owned = Object.entries(S.crewOwned).filter(([,c])=>c>0);
+  if(!owned.length) {
+    cl.innerHTML = '<div style="font-size:0.8rem;color:var(--text2)">No crew hired yet.</div>';
+  } else {
+    owned.forEach(([id,cnt]) => {
+      const c = CREW_TYPES[+id];
+      if(!c) return;
+      const d = document.createElement('div');
+      d.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid var(--border)';
+      d.innerHTML=`<span>${c.icon} ${c.name} <span style="color:var(--gold);font-family:var(--fmono)">x${cnt}</span></span><span style="font-size:0.72rem;color:var(--text2)">ATK+${c.atk*cnt} DEF+${c.def*cnt}</span>`;
+      cl.appendChild(d);
+    });
+  }
+
+  ch.innerHTML = '<div style="font-family:var(--ff);font-size:0.65rem;letter-spacing:0.15em;color:var(--text2);text-transform:uppercase;margin-bottom:0.5rem">Hire Crew</div>';
+  CREW_TYPES.forEach(c => {
+    const locked = S.level < c.lvlReq;
+    const d = document.createElement('div');
+    d.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:0.35rem 0;border-bottom:1px solid var(--border)';
+    d.innerHTML=`
+      <span style="font-size:0.82rem">${c.icon} ${c.name} <span style="font-size:0.68rem;color:var(--text2)">(ATK+${c.atk} DEF+${c.def})</span></span>
+      <button class="btn btn-green btn-sm" ${locked||S.money<c.cost?'disabled':''} onclick="hireCrew(${c.id})">
+        $${c.cost.toLocaleString()}
+      </button>
+    `;
+    ch.appendChild(d);
+  });
+
+  if(ct) ct.textContent = totalCrew() + ' Soldiers';
+
+  const pl = document.getElementById('perk-list');
+  if(!pl) return;
+  pl.innerHTML = '';
+  PERKS.forEach(pk => {
+    const owned2 = S.perksOwned.includes(pk.id);
+    const locked = S.level < pk.lvlReq;
+    const d = document.createElement('div');
+    d.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:0.5rem;padding:0.4rem 0;border-bottom:1px solid var(--border)';
+    d.innerHTML=`
+      <div>
+        <div style="font-size:0.82rem;color:${owned2?'var(--gold)':'var(--text)'}">${owned2?'✅':''} ${pk.name}</div>
+        <div style="font-size:0.7rem;color:var(--text2)">${pk.desc}</div>
+      </div>
+      ${owned2
+        ? '<span class="tag tag-gold">Owned</span>'
+        : `<button class="btn btn-blue btn-sm" ${locked||S.money<pk.cost?'disabled':''} onclick="buyPerk(${pk.id})">$${pk.cost.toLocaleString()}</button>`
+      }
+    `;
+    pl.appendChild(d);
+  });
+}
+
+function renderStats() {
+  function tbl(id, rows) {
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.innerHTML = rows.map(([k,v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('');
+  }
+  const title = TITLES[Math.min(S.level-1, TITLES.length-1)];
+  tbl('profile-table',[
+    ['Name', S.name],
+    ['Gang', S.gangName],
+    ['Title', title],
+    ['Level', S.level],
+    ['XP', S.xp.toLocaleString() + ' / ' + xpNeeded(S.level).toLocaleString()],
+    ['Attack Power', playerAtk()],
+    ['Defense Power', playerDef()],
+    ['Crew Size', totalCrew()],
+  ]);
+  tbl('combat-table',[
+    ['Fights Won', S.wins.toLocaleString()],
+    ['Fights Lost', S.losses.toLocaleString()],
+    ['Win Rate', S.wins+S.losses>0 ? Math.round(S.wins/(S.wins+S.losses)*100)+'%' : 'N/A'],
+    ['Respect', S.respect.toLocaleString()],
+  ]);
+  tbl('wealth-table',[
+    ['Cash on Hand', '$'+S.money.toLocaleString()],
+    ['Total Earned', '$'+S.totalEarned.toLocaleString()],
+    ['Hourly Income', '$'+totalIncome().toLocaleString()+'/hr'],
+    ['Properties', Object.values(S.propOwned).reduce((a,b)=>a+b,0)],
+  ]);
+  tbl('jobs-table',[
+    ['Jobs Completed', S.totalJobs.toLocaleString()],
+    ['Active City', S.level<3?'New York':S.level<7?'Chicago':S.level<11?'Las Vegas':'Miami'],
+  ]);
+}
+
+// ═══════════════════════════════════════
+//  ACTIONS — JOBS
+// ═══════════════════════════════════════
+
+function doJob(id) {
+  const job = JOBS_DATA[id];
+  if(S.energy < job.energy)    { toast('⚡ Not enough energy!'); return; }
+  if(S.restEndTime > Date.now()){ toast('🛌 You are resting!'); return; }
+  if(S.hospEndTime > Date.now()){ toast('🏥 You are in hospital!'); return; }
+
+  const multi = payMulti();
+  const pay   = Math.round(rand(job.minPay, job.maxPay) * multi);
+  const xpG   = Math.round(job.xp * (1 + (S.level-1)*0.12));
+
+  S.energy    -= job.energy;
+  S.money     += pay;
+  S.totalEarned += pay;
+  S.totalJobs++;
+  addXP(xpG);
+  log(`${job.icon} <span style="color:var(--text)">${job.name}</span> — <span style="color:var(--gold2)">+$${pay.toLocaleString()}</span>, +${xpG} XP`, 'win');
+  save(); render();
+}
+
+// ═══════════════════════════════════════
+//  ACTIONS — REST (1 hour real timer)
+// ═══════════════════════════════════════
+
+function doRest() {
+  if(S.energy >= maxEnergy()) { toast('Already at full energy!'); return; }
+  if(S.hospEndTime > Date.now()) { toast('🏥 Can\'t rest in hospital!'); return; }
+  S.restEndTime = Date.now() + 60 * 60 * 1000; // 1 hour
+  log('🛌 You lie low and rest. Energy will fully restore in 1 hour.', 'info');
+  save(); render();
+}
+
+function cancelRest() {
+  // partial energy recovery
+  const elapsed = Math.max(0, Date.now() - (S.restEndTime - 3600000));
+  const fraction = elapsed / 3600000;
+  const ME = maxEnergy();
+  S.energy = Math.min(ME, Math.round(S.energy + (ME - S.energy) * fraction * 1.5));
+  S.restEndTime = 0;
+  log('🛌 Rest cancelled. Partial energy recovered.', 'info');
+  save(); render();
+}
+
+// ═══════════════════════════════════════
+//  ACTIONS — FIGHT
+// ═══════════════════════════════════════
+
+function refreshFightList() {
+  S.fightSeed = Math.random();
+  fightListCache = [];
+  buildFightList();
+  renderFightList();
+  save();
+}
+
+let pendingFight = null;
+
+function doFight(idx, mode) {
+  if(S.hospEndTime > Date.now()) { toast('🏥 You are in hospital!'); return; }
+  if(S.health <= 0) { toast('❤️ Heal up first!'); return; }
+  const f = fightListCache[idx];
+  if(!f) return;
+
+  const myAtk = playerAtk(), myDef = playerDef();
+  const atkRoll = myAtk * (0.7 + Math.random() * 0.6);
+  const defRoll = f.def  * (0.7 + Math.random() * 0.6);
+  const won = atkRoll > defRoll;
+
+  pendingFight = {f, won};
+
+  const cb = document.getElementById('combat-box');
+  cb.className = 'combat-box ' + (won ? 'win' : 'lose');
+
+  const vsHtml = `
+    <div class="atk-side">
+      <div class="atk-label">You</div>
+      <div class="atk-name">${S.name}</div>
+      <div class="atk-pow">${Math.round(atkRoll)}</div>
+    </div>
+    <div class="atk-vs">VS</div>
+    <div class="atk-side">
+      <div class="atk-label">${f.type==='player'?'Player':'AI Gang'}</div>
+      <div class="atk-name">${f.name}</div>
+      <div class="atk-pow">${Math.round(defRoll)}</div>
+    </div>
+  `;
+  document.getElementById('cm-vs').innerHTML = vsHtml;
+
+  if(won) {
+    const dmgTaken = Math.round(Math.random() * 15);
+    S.health = Math.max(1, S.health - dmgTaken);
+    S.money  += f.reward;
+    S.totalEarned += f.reward;
+    S.wins++;
+    S.respect++;
+    addXP(f.xp);
+    set('cm-icon', '🏆');
+    set('cm-title', 'VICTORY!');
+    document.getElementById('cm-detail').innerHTML =
+      `You defeated <strong>${f.name}</strong> (${f.gang}).<br>
+       Earned <strong style="color:var(--gold2)">$${f.reward.toLocaleString()}</strong> + <strong style="color:var(--blue2)">${f.xp} XP</strong>.<br>
+       Took <strong style="color:var(--red2)">${dmgTaken} damage</strong> in the fight.`;
+    log(`🏆 Beat ${f.name} (${f.gang}) — +$${f.reward.toLocaleString()}, +${f.xp}XP`, 'win');
+    // remove from list
+    fightListCache.splice(idx, 1);
+  } else {
+    const dmg = rand(20, 45);
+    S.health = Math.max(0, S.health - dmg);
+    S.losses++;
+    // hospital if health hits 0
+    if(S.health <= 0) {
+      S.health = 0;
+      S.hospEndTime = Date.now() + 5*60*1000; // 5 min hospital
+    }
+    set('cm-icon', '💀');
+    set('cm-title', 'DEFEATED!');
+    document.getElementById('cm-detail').innerHTML =
+      `<strong>${f.name}</strong> (${f.gang}) overpowered you.<br>
+       Lost <strong style="color:var(--red2)">${dmg} health</strong>.
+       ${S.health<=0 ? '<br><strong style="color:var(--red2)">Sent to hospital for 5 minutes!</strong>' : ''}`;
+    log(`💀 Lost to ${f.name} (${f.gang}) — took ${dmg} damage${S.health<=0?' — HOSPITALISED':''}`, 'lose');
+  }
+  save();
+  document.getElementById('combat-modal').classList.add('open');
+}
+
+function closeCombat() {
+  document.getElementById('combat-modal').classList.remove('open');
+  render();
+  renderFightList();
+}
+
+function doHeal() {
+  const MH = maxHealth();
+  if(S.health >= MH) { toast('Already at full health!'); return; }
+  if(S.money < 200) { toast('Need $200 to heal!'); return; }
+  S.money -= 200;
+  S.health = MH;
+  log('💊 Paid $200 to patch up. Full health restored.', 'info');
+  save(); render();
+}
+
+// ═══════════════════════════════════════
+//  ACTIONS — PROPERTIES
+// ═══════════════════════════════════════
+
+function buyProp(id) {
+  const p = PROPERTIES[id];
+  if(S.money < p.cost) { toast('Not enough cash!'); return; }
+  if(S.level < p.lvlReq) { toast('Level too low!'); return; }
+  S.money -= p.cost;
+  S.propOwned[id] = (S.propOwned[id] || 0) + 1;
+  log(`${p.icon} Purchased <strong>${p.name}</strong> — +$${Math.round(p.baseIncome*incomeMulti()).toLocaleString()}/hr income`, 'prop');
+  save(); render();
+}
+
+function collectIncome() {
+  const inc = totalIncome();
+  if(inc === 0) { toast('No properties generating income yet.'); return; }
+  const elapsed   = (Date.now() - (S.lastIncomeTick||Date.now())) / 1000;
+  const hrs       = elapsed / 3600;
+  const earned    = Math.max(1, Math.floor(inc * hrs));
+  S.money        += earned;
+  S.totalEarned  += earned;
+  S.lastIncomeTick = Date.now();
+  log(`💰 Collected <strong style="color:var(--green2)">$${earned.toLocaleString()}</strong> from your properties.`, 'prop');
+  save(); render();
+}
+
+// ═══════════════════════════════════════
+//  ACTIONS — CREW / PERKS
+// ═══════════════════════════════════════
+
+function hireCrew(id) {
+  const c = CREW_TYPES[id];
+  if(S.money < c.cost) { toast('Not enough cash!'); return; }
+  if(S.level < c.lvlReq) { toast('Level too low!'); return; }
+  S.money -= c.cost;
+  S.crewOwned[id] = (S.crewOwned[id]||0) + 1;
+  log(`👥 Hired a <strong>${c.name}</strong>. Gang now ${totalCrew()+1} strong.`, 'info');
+  save(); render();
+}
+
+function buyPerk(id) {
+  const pk = PERKS[id];
+  if(S.money < pk.cost) { toast('Not enough cash!'); return; }
+  if(S.level < pk.lvlReq) { toast('Level too low!'); return; }
+  if(S.perksOwned.includes(id)) { toast('Already owned!'); return; }
+  S.money -= pk.cost;
+  S.perksOwned.push(id);
+  log(`✅ Unlocked perk: <strong>${pk.name}</strong> — ${pk.desc}`, 'lvl');
+  save(); render();
+}
+
+// ═══════════════════════════════════════
+//  XP / LEVEL
+// ═══════════════════════════════════════
+
+function addXP(amount) {
+  S.xp += amount;
+  while(S.xp >= xpNeeded(S.level)) {
+    S.xp -= xpNeeded(S.level);
+    S.level++;
+    const ME = maxEnergy(), MH = maxHealth();
+    S.energy = Math.min(ME, S.energy + 20);
+    S.health = Math.min(MH, S.health + 30);
+    showLevelUp();
+    log(`🌟 LEVEL UP → Level ${S.level} — <strong style="color:var(--gold2)">${TITLES[Math.min(S.level-1,TITLES.length-1)]}</strong>`, 'lvl');
+  }
+}
+
+// ═══════════════════════════════════════
+//  TIMERS — regen + rest + hosp
+// ═══════════════════════════════════════
+
+function startLoops() {
+  // every second: update rest / hosp timers
+  setInterval(tickTimers, 1000);
+  // every 5 min: +1 energy
+  setInterval(tickEnergy, 5*60*1000);
+  // every minute: income
+  setInterval(tickIncome, 60*1000);
+  // every 60s: auto-save
+  setInterval(save, 60*1000);
+}
+
+function tickTimers() {
+  const now = Date.now();
+  const ME  = maxEnergy();
+
+  // rest complete?
+  if(S.restEndTime > 0 && now >= S.restEndTime) {
+    S.energy     = ME;
+    S.restEndTime = 0;
+    S.lastEnergyTick = now;
+    log('🛌 Rest complete! Full energy restored.', 'info');
+    save(); render();
+    return;
+  }
+
+  // rest countdown display
+  if(S.restEndTime > 0) {
+    const remaining = S.restEndTime - now;
+    const h = Math.floor(remaining/3600000);
+    const m = Math.floor((remaining%3600000)/60000);
+    const s = Math.floor((remaining%60000)/1000);
+    const txt = `${h>0?h+':':''}${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    set('rest-timer-txt', txt);
+    // partial energy during rest (scales linearly)
+    const elapsed = now - (S.restEndTime - 3600000);
+    const fraction = Math.min(1, elapsed / 3600000);
+    const partialEnergy = Math.round(ME * fraction);
+    set('e-num', partialEnergy);
+    pct('e-bar', (partialEnergy/ME)*100);
+    set('hdr-energy', partialEnergy+'/'+ME);
+    pct('hdr-ebar', (partialEnergy/ME)*100);
+  }
+
+  // hospital countdown
+  if(S.hospEndTime > 0) {
+    if(now >= S.hospEndTime) {
+      const MH = maxHealth();
+      S.health = Math.round(MH * 0.5);
+      S.hospEndTime = 0;
+      log('🏥 Discharged from hospital with 50% health.', 'info');
+      save(); render();
+    } else {
+      const remaining = S.hospEndTime - now;
+      const m = Math.floor(remaining/60000);
+      const s = Math.floor((remaining%60000)/1000);
+      set('hosp-timer-txt', `${m}:${String(s).padStart(2,'0')}`);
+      renderHospWarn();
+    }
+  }
+
+  // energy regen countdown (outside rest)
+  if(!S.restEndTime) {
+    const secsUntil = 300 - Math.floor((now - S.lastEnergyTick)/1000);
+    const etxt = document.getElementById('e-regen');
+    if(etxt) {
+      if(S.energy >= ME) {
+        etxt.textContent = '⚡ Energy full';
+        etxt.classList.remove('ticking');
+      } else {
+        etxt.textContent = `+1 energy in ${Math.max(0,secsUntil)}s`;
+        etxt.classList.add('ticking');
+      }
+    }
+  }
+}
+
+function tickEnergy() {
+  if(S.restEndTime > 0) return; // rest handles it
+  const ME = maxEnergy();
+  if(S.energy < ME) {
+    S.energy = Math.min(ME, S.energy + 1);
+    S.lastEnergyTick = Date.now();
+    save(); render();
+  }
+}
+
+function tickIncome() {
+  const inc = totalIncome();
+  if(inc > 0) {
+    const earned = Math.round(inc / 60);
+    S.money      += earned;
+    S.totalEarned += earned;
+    S.lastIncomeTick = Date.now();
+    // update income ticker
+    set('income-ticker','Income: $'+totalIncome().toLocaleString()+'/hr');
+    const hdrM = document.getElementById('hdr-money');
+    if(hdrM) hdrM.textContent = '$'+S.money.toLocaleString();
+  }
+}
+
+// ═══════════════════════════════════════
+//  UI HELPERS
+// ═══════════════════════════════════════
+
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+  if(name==='fight')      { buildFightList(); renderFightList(); }
+  if(name==='properties') renderProperties();
+  if(name==='crew')       renderCrew();
+  if(name==='stats')      renderStats();
+}
+
+let toastTO = null;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('on');
+  if(toastTO) clearTimeout(toastTO);
+  toastTO = setTimeout(() => el.classList.remove('on'), 2400);
+}
+
+function log(msg, type='info') {
+  const box = document.getElementById('log-box');
+  if(!box) return;
+  const el = document.createElement('div');
+  el.className = 'le le-'+type;
+  const t = new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  el.innerHTML = `<span class="le-time">${t}</span>${msg}`;
+  box.appendChild(el);
+  if(box.children.length > 100) box.removeChild(box.firstChild);
+  box.scrollTop = box.scrollHeight;
+}
+
+function showLevelUp() {
+  const el = document.getElementById('lvl-splash');
+  if(!el) return;
+  const inner = el.querySelector('.lvl-inner');
+  const big   = el.querySelector('.lvl-big');
+  const sub   = el.querySelector('.lvl-sub');
+  if(big) big.textContent = 'LEVEL ' + S.level;
+  if(sub) sub.textContent = TITLES[Math.min(S.level - 1, TITLES.length - 1)];
+  el.classList.add('on');
+  if(inner) {
+    inner.style.animation = 'none';
+    void inner.offsetWidth;
+    inner.style.animation = 'lvl-anim 2.2s ease forwards';
+  }
+  setTimeout(() => el.classList.remove('on'), 2400);
+}
+
+function rand(a,b) { return Math.floor(Math.random()*(b-a+1))+a; }
+
+// ═══════════════════════════════════════
+//  GAME START / RESET
+// ═══════════════════════════════════════
+
+function startGame() {
+  const n  = document.getElementById('name-inp').value.trim();
+  const gn = document.getElementById('gang-inp').value.trim();
+  if(!n) { document.getElementById('name-inp').focus(); return; }
+  S.name     = n;
+  S.gangName = gn || 'The Family';
+  S.lastEnergyTick  = Date.now();
+  S.lastIncomeTick  = Date.now();
+  document.getElementById('setup').style.display = 'none';
+  log(`🔫 Welcome to the streets, <strong>${S.name}</strong>. The ${S.gangName} is open for business.`, 'lvl');
+  save(); render(); startLoops();
+}
+
+function resetGame() {
+  if(!confirm('Wipe all progress? Your empire will be gone forever.')) return;
+  localStorage.removeItem(SAVE_KEY);
+  location.reload();
+}
+
+// ═══════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════
+
+(function init() {
+  if(load()) {
+    document.getElementById('setup').style.display = 'none';
+    log(`🔫 Welcome back, <strong>${S.name}</strong>. The ${S.gangName} never sleeps.`, 'lvl');
+    render();
+    buildFightList();
+    startLoops();
+  }
+})();
+</script>
+</body>
+</html>
